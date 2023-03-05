@@ -8,36 +8,41 @@ import (
 
 func main() {
 	board := Board{}
-	printBoard(&board)
+	gameOver := false
 	piece := X
 	for true {
+		printPrompt()
 		fmt.Println("it's", piece.String()+"'s", "turn")
-		outcome := processTurn(&board, piece)
-		if outcome != "" {
-			fmt.Println(outcome)
+		gameOver, piece = processTurn(&board, piece)
+		printBoard(&board)
+		if gameOver {
 			break
 		}
-		printBoard(&board)
-		piece = switchTurns(piece)
 	}
 }
 
-func processTurn(board *Board, piece Piece) string {
+func processTurn(board *Board, piece Piece) (bool, Piece) {
 	place, err := ReadPlace()
 	if err != nil {
 		fmt.Println(err)
-		return ""
+		return false, piece
 	}
 	if 0 == place {
 		printHelp()
-		return ""
+		return false, piece
 	}
 	err = board.Place(piece, place)
 	if err != nil {
 		fmt.Println(err)
-		return ""
+		return false, piece
 	}
-	return board.Outcome()
+	outcome := board.Outcome()
+	if outcome != "" {
+		fmt.Println(board.Outcome())
+		return true, piece
+	} else {
+		return false, switchTurns(piece)
+	}
 }
 
 func printBoard(board *Board) {
@@ -46,6 +51,9 @@ func printBoard(board *Board) {
 	printRow(board[1])
 	printSeparator()
 	printRow(board[2])
+}
+
+func printPrompt() {
 	fmt.Println("type a whole number between 1 and 9 or h for help")
 }
 
@@ -58,13 +66,16 @@ func printSeparator() {
 }
 
 func printHelp() {
+	fmt.Println("place your piece according to this layout:")
+	fmt.Println("")
 	fmt.Println("", 1, "|", 2, "|", 3)
 	printSeparator()
 	fmt.Println("", 4, "|", 5, "|", 6)
 	printSeparator()
 	fmt.Println("", 7, "|", 8, "|", 9)
-	fmt.Println("place your piece according to this layout")
-	fmt.Println("===========")
+	fmt.Println("")
+	fmt.Println("==========================================")
+	fmt.Println("")
 }
 
 func switchTurns(piece Piece) Piece {
