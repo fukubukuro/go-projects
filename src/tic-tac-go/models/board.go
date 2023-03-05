@@ -73,7 +73,7 @@ func (board *Board) Outcome() string {
 		}
 	}
 	if filled {
-		return "cats game."
+		return "cat's game."
 	}
 	return ""
 }
